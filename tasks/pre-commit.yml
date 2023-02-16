@@ -16,8 +16,9 @@
   ansible.builtin.command:
     cmd: "etckeeper unclean"
     chdir: '/etc'
-  ignore_errors: true
   register: etckeeper_unclean
+  changed_when: etckeeper_unclean.rc != 1
+  failed_when: etckeeper_unclean.rc >= 2
   when: etckeeper_exists.rc == 0
 
 

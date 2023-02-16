@@ -45,12 +45,14 @@
     cmd: 'etckeeper init'
     chdir: '/etc'
     creates: '/etc/.git'
+  register: etckeeper_init
 
 
 - name: Run etckeeper pre-commit
   become: true
   ansible.builtin.import_tasks:
     file: 'pre-commit.yml'
+  when: etckeeper_init is changed
 
 
 # Flush any handlers that we might have called
