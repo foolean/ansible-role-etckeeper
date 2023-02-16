@@ -1,0 +1,29 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+- name: Ensure etckeeper exists
+  ansible.builtin.command:
+    cmd: "test -f /usr/bin/etckeeper"
+  ignore_errors: true
+  changed_when: false
+  register: etckeeper_exists
+
+
+- name: Check if etckeeper clean (pre-commit)
+  become: true
+  ansible.builtin.command:
+    cmd: "etckeeper unclean"
+    chdir: '/etc'
+  ignore_errors: true
+  register: etckeeper_unclean
+  when: etckeeper_exists.rc == 0
+
+
+- name: Run etckeeper pre-commit
+  become: true
+  ansible.builtin.command:
+    cmd: "etckeeper commit \"Automatic pre-commit by ansible for play '{{ ansible_play_name }}'\""
+    chdir: '/etc'
+  when: etckeeper_exists.rc == 0 and etckeeper_unclean.rc == 0

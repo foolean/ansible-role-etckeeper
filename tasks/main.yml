@@ -1,0 +1,59 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+# Gather facts if we don't already have them.  This step
+# is required in order to be able to specify tags at runtime
+- name: Gather facts
+  become: true
+  ansible.builtin.setup:
+  tags: ['always']
+  when: ansible_facts == {}
+
+
+- name: Install etckeeper
+  become: true
+  ansible.builtin.package:
+    name: etckeeper
+    state: present
+
+
+- name: Ensure etckeeper directory exists
+  become: true
+  ansible.builtin.file:
+    path: '/etc/etckeeper'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+
+
+- name: Configure etckeeper
+  become: true
+  ansible.builtin.template:
+    src: 'etc/etckeeper/etckeeper.conf.j2'
+    dest: '/etc/etckeeper/etckeeper.conf'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+
+- name: Initialize etckeeper
+  become: true
+  ansible.builtin.command:
+    cmd: 'etckeeper init'
+    chdir: '/etc'
+    creates: '/etc/.git'
+
+
+- name: Run etckeeper pre-commit
+  become: true
+  ansible.builtin.import_tasks:
+    file: 'pre-commit.yml'
+
+
+# Flush any handlers that we might have called
+- name: Flush handlers
+  ansible.builtin.meta:
+    flush_handlers
