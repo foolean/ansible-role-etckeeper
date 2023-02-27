@@ -63,3 +63,4 @@
   # Tags to be applied to this role (block)
   tags:
     - 'role_foolean_etckeeper'
+    - 'always'

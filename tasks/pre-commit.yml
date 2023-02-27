@@ -9,7 +9,8 @@
   ignore_errors: true
   changed_when: false
   register: etckeeper_exists
-
+  tags:
+    - always
 
 - name: Check if etckeeper clean (pre-commit)
   become: true
@@ -20,6 +21,8 @@
   changed_when: etckeeper_unclean.rc != 1
   failed_when: etckeeper_unclean.rc >= 2
   when: etckeeper_exists.rc == 0
+  tags:
+    - always
 
 
 - name: Run etckeeper pre-commit
@@ -28,3 +31,5 @@
     cmd: "etckeeper commit \"Automatic pre-commit by ansible for play '{{ ansible_play_name }}'\""
     chdir: '/etc'
   when: etckeeper_exists.rc == 0 and etckeeper_unclean.rc == 0
+  tags:
+    - always
