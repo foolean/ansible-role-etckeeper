@@ -38,7 +38,13 @@ HIGHLEVEL_PACKAGE_MANAGER="{{ ansible_pkg_mgr }}"
 
 # The low-level package manager that's being used.
 # (dpkg, rpm, pacman-g2, etc)
+{% if ansible_os_family == 'RedHat' -%}
+LOWLEVEL_PACKAGE_MANAGER="rpm"
+{% elif ansible_os_family == 'Debian' -%}
+LOWLEVEL_PACKAGE_MANAGER="dpkg"
+{% else -%}
 LOWLEVEL_PACKAGE_MANAGER="{{ ansible_pkg_mgr }}"
+{% endif -%}
 
 # To push each commit to a remote, put the name of the remote here.
 # (eg, "origin" for git).
